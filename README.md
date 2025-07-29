@@ -221,10 +221,10 @@ docker-compose -f docker-compose.prod.yml up -d
 
 ## License
 
-Proprietary - lyfX.ai
+- **Code**: Licensed under **Apache-2.0**. See `LICENSE`.
+- **Sample data** (files under `data/` or otherwise marked): **CC BY 4.0**. See `data_license/LICENSE`.
 
-This repository is only made public to showcase our capabilities. If you wish to discuss licensing models, please contact us at
-info@lyfx.ai or the author directly.
+If you contribute, you agree that your contributions are licensed under the same terms.
 
 ## Support
 

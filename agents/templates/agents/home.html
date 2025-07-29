@@ -1,0 +1,455 @@
+{% extends "base_generic.html" %} {% load static %} {% block content %}
+
+<!-- Hero Section -->
+<section
+  class="relative overflow-hidden bg-gradient-to-br from-purple-50 via-white to-indigo-50"
+>
+  <!-- Background decoration -->
+  <div class="absolute inset-0">
+    <div
+      class="absolute top-0 left-1/2 transform -translate-x-1/2 w-96 h-96 bg-gradient-to-r from-purple-300 to-indigo-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"
+    ></div>
+    <div
+      class="absolute bottom-0 right-1/4 w-80 h-80 bg-gradient-to-r from-pink-300 to-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse animation-delay-2000"
+    ></div>
+  </div>
+
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+    <div class="text-center max-w-4xl mx-auto">
+      <h1
+        class="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 mb-12 leading-tight"
+      >
+        Fire up your personal
+        <span class="gradient-text">AI task-force</span> ⚡️
+      </h1>
+
+      <p
+        class="text-xl md:text-2xl text-gray-600 mb-12 leading-relaxed max-w-3xl mx-auto"
+      >
+        Spin up specialized AI agents that help grow your business: prepare for
+        trade shows' meetings, estimate carbon footprints, monitor competitors,
+        and more.
+      </p>
+      <p
+        class="text-xl md:text-2xl text-gray-600 mb-12 leading-relaxed max-w-3xl mx-auto"
+      >
+        Manage all your agents from one intuitive interface.
+      </p>
+
+      <!-- Steps -->
+      <ul class="steps text-left max-w-2xl mx-auto mb-12 space-y-4">
+        {% if user.is_authenticated %}
+        <li class="flex items-center text-lg text-gray-700">
+          <span
+            class="inline-flex items-center justify-center w-8 h-8 bg-purple-100 text-purple-700 rounded-full font-semibold mr-4 flex-shrink-0"
+            >①</span
+          >
+          Alredy signed in
+        </li>
+        {% else %}
+        <li class="flex items-center text-lg text-gray-700">
+          <span
+            class="inline-flex items-center justify-center w-8 h-8 bg-purple-100 text-purple-700 rounded-full font-semibold mr-4 flex-shrink-0"
+            >①</span
+          >
+          Sign in
+        </li>
+        {% endif %}
+        <li class="flex items-center text-lg text-gray-700">
+          <span
+            class="inline-flex items-center justify-center w-8 h-8 bg-purple-100 text-purple-700 rounded-full font-semibold mr-4 flex-shrink-0"
+            >②</span
+          >
+          Go to Dashboard
+        </li>
+        <li class="flex items-center text-lg text-gray-700">
+          <span
+            class="inline-flex items-center justify-center w-8 h-8 bg-purple-100 text-purple-700 rounded-full font-semibold mr-4 flex-shrink-0"
+            >③</span
+          >
+          Pick your Agent and let them work for you
+        </li>
+      </ul>
+
+      <!-- Main CTA -->
+      {% if user.is_authenticated %}
+      <a
+        href="{% url 'agents:dashboard' %}"
+        class="inline-flex items-center bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xl font-bold px-12 py-6 rounded-2xl shadow-2xl hover:shadow-purple-500/25 transform hover:scale-102 transition-all duration-300 mb-12"
+      >
+        Go to Dashboard →
+      </a>
+      {% else %}
+      <a
+        href="{% url 'login' %}"
+        class="inline-flex items-center bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-xl font-bold px-12 py-6 rounded-2xl shadow-2xl hover:shadow-purple-500/25 transform hover:scale-102 transition-all duration-300 mb-12"
+      >
+        Start free →
+      </a>
+      {% endif %}
+
+      <!-- Trust badge
+      <div class="trust-badge">
+        <span
+          class="inline-flex items-center px-6 py-3 bg-white/80 backdrop-blur-sm rounded-full text-gray-600 font-medium shadow-lg border border-gray-200"
+        >
+          <span
+            class="w-2 h-2 bg-green-500 rounded-full mr-3 animate-pulse"
+          ></span>
+          2 148 611 tasks automated this month
+        </span>
+      </div>
+      -->
+    </div>
+  </div>
+</section>
+
+<!-- Why AgentVerse Feature Block -->
+<section class="py-20 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+        Why lyfX.ai AgentVerse?
+      </h2>
+      <p class="text-2xl text-gray-600 font-medium max-w-3xl mx-auto">
+        Your AI studio tailored to your business
+      </p>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+      <!-- Feature 1 -->
+      <div
+        class="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl p-8 hover:shadow-lg transition-all"
+      >
+        <div
+          class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-6"
+        >
+          <svg
+            class="w-6 h-6 text-purple-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+            ></path>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 mb-3">Reliable</h3>
+        <p class="text-gray-600">
+          Cutting-edge technology delivering reliable agent workflows.
+        </p>
+      </div>
+
+      <!-- Feature 2 -->
+      <div
+        class="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-8 hover:shadow-lg transition-all"
+      >
+        <div
+          class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-6"
+        >
+          <svg
+            class="w-6 h-6 text-blue-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
+            ></path>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 mb-3">
+          Specialized for your needs
+        </h3>
+        <p class="text-gray-600">
+          Custom-built agents that perfectly match your business.
+        </p>
+      </div>
+
+      <!-- Feature 3 -->
+      <div
+        class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 hover:shadow-lg transition-all"
+      >
+        <div
+          class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-6"
+        >
+          <svg
+            class="w-6 h-6 text-green-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 10V3L4 14h7v7l9-11h-7z"
+            ></path>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 mb-3">
+          Realistic workflows
+        </h3>
+        <p class="text-gray-600">
+          Ambient or chat agents crafted for real-world success.
+        </p>
+      </div>
+
+      <!-- Feature 4 -->
+      <div
+        class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl p-8 hover:shadow-lg transition-all"
+      >
+        <div
+          class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center mb-6"
+        >
+          <svg
+            class="w-6 h-6 text-yellow-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+            ></path>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 mb-3">Transparent costs</h3>
+        <p class="text-gray-600">Usage-based meters with no surprises.</p>
+      </div>
+
+      <!-- Feature 5 -->
+      <div
+        class="bg-gradient-to-br from-red-50 to-pink-50 rounded-2xl p-8 hover:shadow-lg transition-all"
+      >
+        <div
+          class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-6"
+        >
+          <svg
+            class="w-6 h-6 text-red-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+            ></path>
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 mb-3">Secure by design</h3>
+        <p class="text-gray-600">
+          GDPR-ready, SOC 2 in progress, full data-deletion on demand.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Agent Cards Section -->
+<section class="py-20 bg-gray-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+        Community Agents
+      </h2>
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+        Ready-to-use AI specialists (public access)
+      </p>
+    </div>
+
+    {% if featured_agents %}
+    <!-- featured agents are a subset of public agents -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-10 mb-12">
+      {% for agent in featured_agents %}
+      <!-- Dynamic Agent Card -->
+      <div
+        class="agent-card bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl border border-gray-100"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <a
+            href="{{ agent.chat_url }}"
+            class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-6 py-2 rounded-lg font-semibold transition-all transform hover:scale-102"
+          >
+            Run
+          </a>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-900 mb-3">
+          🤖 {{ agent.name }}
+        </h3>
+        <p class="text-gray-600 mb-6"><!---->{{ agent.description }}</p>
+      </div>
+      {% endfor %}
+
+      <!-- More Coming Soon Card (always show at the end) -->
+      <div
+        class="agent-card bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl p-8 shadow-lg border border-gray-200 flex items-center justify-center"
+      >
+        <div class="text-center">
+          <div class="text-4xl mb-4">⚡</div>
+          <h3 class="text-xl font-bold text-gray-700 mb-3">
+            More Packs dropping soon…
+          </h3>
+        </div>
+      </div>
+    </div>
+    <!--
+    {% else %}
+    <div class="max-w-md mx-auto text-center py-16">
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-12">
+        <div class="text-6xl mb-6">🚀</div>
+        <h3 class="text-2xl font-bold text-gray-900 mb-4">Coming Soon</h3>
+        <p class="text-gray-600 mb-8">
+          We're preparing amazing AI agents for you. Check back soon!
+        </p>
+
+        <a
+          href="mailto:info@lyfx.ai"
+          class="inline-flex items-center text-purple-600 hover:text-purple-700 font-medium"
+        >
+          <svg
+            class="w-5 h-5 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+            ></path>
+          </svg>
+          Get notified when ready
+        </a>
+      </div>
+    </div>
+    -->
+    {% endif %}
+
+    <!-- Browse All CTA -->
+    <div class="text-center">
+      <a
+        href="{% url 'agents:dashboard' %}"
+        class="inline-flex items-center bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white text-lg font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:scale-102 transition-all"
+      >
+        Browse all agents →
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ Section -->
+<section id="faq" class="py-20 bg-gray-50">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center mb-16">
+      <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+        Frequently Asked Questions
+      </h2>
+    </div>
+
+    <div class="space-y-8">
+      <!-- FAQ 1 -->
+      <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">
+          Is there a free tier?
+        </h3>
+        <p class="text-gray-600">
+          Yes. Our public Agents are free to use (see
+          <em>Agents: Terms of Use</em>).
+        </p>
+      </div>
+
+      <!-- FAQ 2 -->
+      <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">
+          Can I build my own agent?
+        </h3>
+        <p class="text-gray-600">
+          No. We collaborate closely with you to design sophisticated, reliable
+          workflows tailored precisely to your business. Our technology
+          specializes in handling complex scenarios, going beyond simple
+          "no-code" solutions.
+        </p>
+      </div>
+
+      <!-- FAQ 3 -->
+      <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">
+          How do you store my data?
+        </h3>
+        <p class="text-gray-600">
+          Your data is encrypted at rest, deleted upon your request, and never
+          used for model training without your explicit permission.
+        </p>
+      </div>
+
+      <!-- FAQ 4 -->
+      <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">
+          What models power AgentVerse?
+        </h3>
+        <p class="text-gray-600">
+          AgentVerse is powered by cutting-edge LLMs such as Gemini 2.5 and
+          OpenAI's o-series, orchestrated seamlessly with LangGraph. For
+          enhanced security and controlled access, we also offer solutions built
+          with local LLMs.
+        </p>
+      </div>
+
+      <!-- FAQ 5 -->
+      <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+        <h3 class="text-xl font-bold text-gray-900 mb-4">
+          Does it work on mobile?
+        </h3>
+        <p class="text-gray-600">
+          Yes. All our agents run seamlessly in the cloud (either your private
+          cloud or a major provider) accessible effortlessly from mobile,
+          tablet, or desktop.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Final CTA Section -->
+<section class="py-20 bg-gradient-to-r from-purple-600 to-indigo-600">
+  <div class="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
+    <h2 class="text-4xl md:text-5xl font-bold text-white mb-12">
+      Ready to fire up your AI task-force?
+    </h2>
+    <p class="text-xl text-purple-100 mb-12 max-w-2xl mx-auto">
+      Join the organizations and professionals already automating smarter
+      workflows with lyfX.ai AgentVerse
+    </p>
+
+    {% if user.is_authenticated %}
+    <a
+      href="{% url 'agents:dashboard' %}"
+      class="inline-flex items-center bg-white text-purple-600 hover:text-purple-700 text-xl font-bold px-12 py-6 rounded-2xl shadow-2xl hover:shadow-white/25 transform hover:scale-102 transition-all duration-300"
+    >
+      Go to Dashboard →
+    </a>
+    {% else %}
+    <a
+      href="{% url 'login' %}"
+      class="inline-flex items-center bg-white text-purple-600 hover:text-purple-700 text-xl font-bold px-12 py-6 rounded-2xl shadow-2xl hover:shadow-white/25 transform hover:scale-102 transition-all duration-300"
+    >
+      Start Free Today →
+    </a>
+    {% endif %}
+  </div>
+</section>
+
+{% endblock %}

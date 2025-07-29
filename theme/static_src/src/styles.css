@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+/* 
+ * Updated source paths for Tailwind v4
+ * These paths are relative to the static_src directory
+ */
+@source "../../../templates/**/*.{html,js}";
+@source "../../../**/templates/**/*.{html,js}";
+@source "../../../agents/templates/**/*.{html,js}";
+@source "../../../**/*.py";

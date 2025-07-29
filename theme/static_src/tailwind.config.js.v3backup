@@ -1,0 +1,25 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    // Templates within theme app
+    "../templates/**/*.{html,js}",
+
+    // Templates in other apps
+    "../../templates/**/*.{html,js}",
+    "../../**/templates/**/*.{html,js}",
+
+    // Specific app templates
+    "../../agents/templates/**/*.{html,js}",
+
+    // Include any Python files that might contain Tailwind classes
+    "../../**/*.py",
+  ],
+  theme: {
+    extend: {
+      // Custom colors, fonts, etc. can go here
+    },
+  },
+  plugins: [
+    // Add any Tailwind plugins here
+  ],
+};

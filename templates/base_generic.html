@@ -1,0 +1,411 @@
+<!-- {% load static %} -->
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      {% block title %}lyfX.ai AgentVerse - Fire up your personal AI task-force
+      <!---->{% endblock %}
+    </title>
+
+    <!-- Tailwind CSS -->
+    <!-- TEMPORARY: Using CDN to test -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Django Tailwind (commented out for testing) -->
+    <!-- {% tailwind_css %} -->
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/global-custom.css' %}" />
+
+    <!-- App-specific CSS -->
+    {% block extra_css %}{% endblock %}
+
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+
+    <!-- Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    {% block extra_head %}{% endblock %}
+
+    <style>
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+      }
+      .gradient-text {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .agent-card {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .agent-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      }
+    </style>
+  </head>
+  <body class="bg-white min-h-screen">
+    <!-- DEBUG: Better viewport indicator 
+    <div
+      class="fixed top-20 right-4 bg-black text-white p-3 rounded-lg z-50 text-sm font-mono"
+    >
+      <div>Width: <span id="viewport-width"></span>px</div>
+      <div class="block md:hidden text-red-400">Mobile View (< 768px)</div>
+      <div class="hidden md:block text-green-400">Desktop View (≥ 768px)</div>
+    </div>
+    <script>
+      function updateWidth() {
+        document.getElementById("viewport-width").textContent =
+          window.innerWidth;
+      }
+      updateWidth();
+      window.addEventListener("resize", updateWidth);
+    </script>
+    -->
+
+    <!-- Navigation Bar -->
+    <nav
+      class="fixed top-0 left-0 right-0 bg-white shadow-sm border-b border-gray-200 z-50"
+    >
+      <div class="w-full px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+          <!-- Logo Section (separate) -->
+          <div class="flex items-center flex-shrink-0">
+            <a
+              href="https://lyfx.ai/"
+              class="flex items-center space-x-2 sm:space-x-3"
+            >
+              <img
+                src="{% static 'images/Logo.jpeg' %}"
+                alt="lyfX Logo"
+                class="h-10 w-auto"
+              />
+            </a>
+          </div>
+          <div class="flex items-center flex-shrink-0 ml-4">
+            <a
+              href="{% url 'agents:home' %}"
+              class="flex items-center space-x-2 sm:space-x-3"
+            >
+              <div class="hidden sm:flex flex-col">
+                <span class="text-xl font-bold gradient-text"
+                  >lyfX.ai AgentVerse</span
+                >
+                <span class="text-xs text-gray-500">AI Agent Workspace</span>
+              </div>
+            </a>
+          </div>
+
+          <!-- Desktop Navigation (separate, with flex-1) -->
+          <nav
+            class="hidden md:flex items-center space-x-6 lg:space-x-8 flex-1 justify-center"
+          >
+            <a
+              href="{% url 'agents:dashboard' %}"
+              class="text-gray-700 hover:text-purple-600 px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap"
+            >
+              Dashboard
+            </a>
+            <!--
+            <a
+              href="#"
+              class="text-gray-700 hover:text-purple-600 px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap"
+            >
+              Pricing
+            </a>
+            -->
+            <a
+              href="{% url 'agents:home' %}#faq"
+              class="text-gray-700 hover:text-purple-600 px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap"
+            >
+              FAQ
+            </a>
+            <a
+              href="https://lyfx.ai/blog/"
+              class="text-gray-700 hover:text-purple-600 px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap"
+            >
+              Blog
+            </a>
+          </nav>
+
+          <!-- Desktop Auth Section (separate) -->
+          <div class="hidden md:flex items-center space-x-4 flex-shrink-0">
+            {% if user.is_authenticated %}
+            <div
+              class="flex items-center space-x-3 pr-4 border-r border-gray-200"
+            >
+              <div
+                class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center"
+              >
+                <span class="text-sm font-semibold text-purple-700">
+                  {{ user.username|first|upper }}
+                </span>
+              </div>
+              <span class="text-gray-700 text-sm font-medium">
+                {{ user.username }}
+              </span>
+            </div>
+            <a
+              href="{% url 'agents:dashboard' %}"
+              class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-all shadow-sm hover:shadow-md"
+            >
+              Go to Dashboard
+            </a>
+            <form action="{% url 'logout' %}" method="post" class="inline">
+              {% csrf_token %}
+              <button
+                type="submit"
+                class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              >
+                Sign Out
+              </button>
+            </form>
+            {% else %}
+            <a
+              href="{% url 'login' %}"
+              class="text-gray-700 hover:text-purple-600 px-3 py-2 text-sm font-medium transition-colors"
+            >
+              Log in
+            </a>
+            <a
+              href="{% url 'agents:dashboard' %}"
+              class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-semibold transition-all shadow-sm hover:shadow-md"
+            >
+              Get Started
+            </a>
+            {% endif %}
+          </div>
+
+          <!-- Mobile menu button -->
+          <div class="md:hidden">
+            <button
+              type="button"
+              id="mobile-menu-button"
+              class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500"
+            >
+              <span class="sr-only">Open main menu</span>
+              <svg
+                class="block h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Mobile menu -->
+    <div class="md:hidden hidden" id="mobile-menu">
+      <div class="px-4 pt-2 pb-3 space-y-1 bg-white border-t border-gray-200">
+        <a
+          href="{% url 'agents:dashboard' %}"
+          class="block px-3 py-2 text-gray-700 hover:text-purple-600 font-medium"
+        >
+          Dashboard
+        </a>
+        <!--
+        <a
+          href="#"
+          class="block px-3 py-2 text-gray-700 hover:text-purple-600 font-medium"
+        >
+          Pricing
+        </a>
+        -->
+        <a
+          href="{% url 'agents:home' %}#faq"
+          class="block px-3 py-2 text-gray-700 hover:text-purple-600 font-medium"
+        >
+          FAQ
+        </a>
+        <a
+          href="https://lyfx.ai/blog/"
+          class="block px-3 py-2 text-gray-700 hover:text-purple-600 font-medium"
+        >
+          Blog
+        </a>
+
+        <div class="pt-4 pb-3 border-t border-gray-200">
+          {% if user.is_authenticated %}
+          <div class="flex items-center px-3 py-2 space-x-3 mb-3">
+            <div
+              class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0"
+            >
+              <span class="text-sm font-semibold text-purple-700">
+                {{ user.username|first|upper }}
+              </span>
+            </div>
+            <span class="text-gray-700 text-sm font-medium">
+              {{ user.username }}
+            </span>
+          </div>
+          <a
+            href="{% url 'agents:dashboard' %}"
+            class="block w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-center px-4 py-2 rounded-lg text-sm font-semibold mb-2"
+          >
+            Go to Dashboard
+          </a>
+          <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button
+              type="submit"
+              class="block w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium"
+            >
+              Sign Out
+            </button>
+          </form>
+          {% else %}
+          <a
+            href="{% url 'login' %}"
+            class="block px-3 py-2 text-gray-700 hover:text-purple-600 font-medium mb-2"
+          >
+            Log in
+          </a>
+          <a
+            href="{% url 'agents:dashboard' %}"
+            class="block w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-center px-4 py-2 rounded-lg text-sm font-semibold mx-3"
+          >
+            Get Started
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content - Added pt-16 to account for fixed navbar -->
+    <main class="flex-1 pt-16">
+      {% block content %}
+      <!-- Child templates will insert content here -->
+      {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div>
+            <h3 class="font-semibold mb-4">Product</h3>
+            <ul class="space-y-2 text-sm text-gray-300">
+              <li>
+                <a href="#" class="hover:text-white transition-colors"
+                  >Agents</a
+                >
+              </li>
+              <li>
+                <a
+                  href="mailto:info@lyfx.ai"
+                  class="hover:text-white transition-colors"
+                  >Pricing</a
+                >
+              </li>
+              <li>
+                <a
+                  href="mailto:info@lyfx.ai"
+                  class="hover:text-white transition-colors"
+                  >Enterprise</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="font-semibold mb-4">Resources</h3>
+            <ul class="space-y-2 text-sm text-gray-300">
+              <!--
+              <li>
+                <a href="#" class="hover:text-white transition-colors"
+                  >Documentation</a
+                >
+              </li>
+              -->
+              <li>
+                <a
+                  href="https://lyfx.ai/blog/"
+                  class="hover:text-white transition-colors"
+                  >Blog</a
+                >
+              </li>
+              <li>
+                <a
+                  href="mailto:info@lyfx.ai"
+                  class="hover:text-white transition-colors"
+                  >Support</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3 class="font-semibold mb-4">Company</h3>
+            <ul class="space-y-2 text-sm text-gray-300">
+              <li>
+                <a
+                  href="https://lyfx.ai/team/"
+                  class="hover:text-white transition-colors"
+                  >About</a
+                >
+              </li>
+              <li>
+                <a
+                  href="mailto:info@lyfx.ai"
+                  class="hover:text-white transition-colors"
+                  >Careers</a
+                >
+              </li>
+              <li>
+                <a
+                  href="mailto:info@lyfx.ai"
+                  class="hover:text-white transition-colors"
+                  >Contact</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div
+          class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center"
+        >
+          <div class="flex items-center space-x-4">
+            <img
+              src="{% static 'images/Logo.jpeg' %}"
+              alt="lyfX Logo"
+              class="h-6 w-auto"
+            />
+            <span class="font-bold gradient-text">lyfX.ai AgentVerse</span>
+          </div>
+          <p class="text-sm text-gray-400 mt-4 md:mt-0">
+            Agents that work while you dream.
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Mobile Menu JavaScript -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const mobileMenuButton = document.getElementById("mobile-menu-button");
+        const mobileMenu = document.getElementById("mobile-menu");
+
+        mobileMenuButton.addEventListener("click", function () {
+          mobileMenu.classList.toggle("hidden");
+        });
+      });
+    </script>
+  </body>
+</html>

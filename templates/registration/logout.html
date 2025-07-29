@@ -1,0 +1,200 @@
+{% extends "base_generic.html" %} {% block title %}Signed Out - lyfX
+AgentVerse{% endblock %} {% block content %}
+
+<div
+  class="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-white to-indigo-50 py-12 px-4 sm:px-6 lg:px-8"
+>
+  <!-- Background decoration -->
+  <div class="absolute inset-0 overflow-hidden">
+    <div
+      class="absolute top-1/4 left-1/4 w-64 h-64 bg-gradient-to-r from-green-300 to-emerald-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"
+    ></div>
+    <div
+      class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-gradient-to-r from-blue-300 to-cyan-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse animation-delay-2000"
+    ></div>
+  </div>
+
+  <div class="relative max-w-md w-full space-y-8">
+    <!-- Header -->
+    <div class="text-center">
+      <div
+        class="inline-flex items-center px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium mb-6"
+      >
+        <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+        Session Ended Securely
+      </div>
+
+      <div
+        class="w-20 h-20 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-6"
+      >
+        <svg
+          class="w-10 h-10 text-green-600"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+          ></path>
+        </svg>
+      </div>
+
+      <h2 class="text-4xl font-bold text-gray-900 mb-2">
+        Successfully Signed Out
+      </h2>
+      <p class="text-lg text-gray-600">
+        Your AgentVerse session has ended safely
+      </p>
+    </div>
+
+    <!-- Main Content -->
+    <div
+      class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-100 p-8 text-center"
+    >
+      <div class="space-y-8">
+        <!-- Success Message -->
+        <div class="bg-green-50 border border-green-200 rounded-xl p-6">
+          <div class="flex items-center justify-center mb-3">
+            <svg
+              class="w-6 h-6 text-green-500 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+              ></path>
+            </svg>
+            <p class="text-green-800 font-semibold">Session Secured</p>
+          </div>
+          <p class="text-green-700 text-sm">
+            All your data remains private and your agents are safely stored.
+          </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="space-y-4">
+          <a
+            href="{% url 'login' %}"
+            class="w-full flex justify-center items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200"
+          >
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 10V3L4 14h7v7l9-11h-7z"
+              ></path>
+            </svg>
+            Launch AgentVerse Again
+          </a>
+
+          <a
+            href="{% url 'agents:home' %}"
+            class="w-full flex justify-center items-center px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-xl transition-colors duration-200"
+          >
+            <svg
+              class="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+              ></path>
+            </svg>
+            Explore Public Agents
+          </a>
+        </div>
+
+        <!-- Stats -->
+        <div class="pt-6 border-t border-gray-200">
+          <div class="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <div class="text-2xl font-bold text-gray-900">2.1M+</div>
+              <div class="text-xs text-gray-500">Tasks Automated</div>
+            </div>
+            <div>
+              <div class="text-2xl font-bold text-gray-900">50+</div>
+              <div class="text-xs text-gray-500">Agent Types</div>
+            </div>
+            <div>
+              <div class="text-2xl font-bold text-gray-900">24/7</div>
+              <div class="text-xs text-gray-500">Available</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Info -->
+        <div class="pt-4 border-t border-gray-200">
+          <p class="text-sm text-gray-600 mb-4">
+            Thank you for using lyfX AgentVerse. Your AI agents are ready
+            whenever you return.
+          </p>
+          <div
+            class="flex items-center justify-center space-x-4 text-xs text-gray-500"
+          >
+            <a
+              href="mailto:info@lyfx.ai"
+              class="text-purple-600 hover:text-purple-700 font-medium transition-colors"
+            >
+              Contact Support
+            </a>
+            <span>•</span>
+            <a href="#" class="hover:text-purple-600 transition-colors"
+              >Privacy</a
+            >
+            <span>•</span>
+            <a href="#" class="hover:text-purple-600 transition-colors"
+              >Terms</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trust Badge -->
+    <div class="text-center">
+      <div
+        class="inline-flex items-center px-4 py-2 bg-white/60 backdrop-blur-sm rounded-full text-sm text-gray-600 border border-gray-200"
+      >
+        <svg
+          class="w-4 h-4 mr-2 text-green-500"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+          ></path>
+        </svg>
+        Agents that work while you dream ⚡️
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .animation-delay-2000 {
+    animation-delay: 2000ms;
+  }
+</style>
+
+{% endblock %}

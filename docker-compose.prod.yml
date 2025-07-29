@@ -1,0 +1,98 @@
+services:
+  db:
+    image: postgres:16
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=lyfx_agents_prod
+      - POSTGRES_USER=lyfxuser
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lyfxuser -d lyfx_agents_prod"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build: .
+    command: uvicorn lyfx_agents.asgi:application --host 0.0.0.0 --port 8000 --workers 2
+    volumes:
+      - static_volume:/app/static
+      - media_volume:/app/media
+    ports:
+      - "127.0.0.1:8001:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      # Django settings
+      - DJANGO_SETTINGS_MODULE=lyfx_agents.settings.prod
+      - DATABASE_URL=postgresql://lyfxuser:${DB_PASSWORD}@db:5432/lyfx_agents_prod
+      - PYTHONUNBUFFERED=1
+
+      # API Keys (passed from .env file)
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
+      - LANGSMITH_ENDPOINT=${LANGSMITH_ENDPOINT}
+      - LANGCHAIN_TRACING_V2=true
+      - LANGCHAIN_PROJECT="lyfx_agents_prod"
+      - TAVILY_API_KEY=${TAVILY_API_KEY}
+      - SCRAPINGBEE_API_KEY=${SCRAPINGBEE_API_KEY}
+      - SCRAPINGBEE_ENDPOINT=${SCRAPINGBEE_ENDPOINT}
+      - LYFX_EMAIL_KEY=${LYFX_EMAIL_KEY}
+
+      # Celery configuration
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  celery:
+    build: .
+    command: celery -A lyfx_agents worker -l info
+    volumes:
+      - static_volume:/app/static # Removed .:/app
+      - media_volume:/app/media
+    depends_on:
+      - db
+      - redis
+    environment:
+      # Same environment as web service
+      # Django settings
+      - DJANGO_SETTINGS_MODULE=lyfx_agents.settings.prod
+      - DATABASE_URL=postgresql://lyfxuser:${DB_PASSWORD}@db:5432/lyfx_agents_prod
+      - PYTHONUNBUFFERED=1
+
+      # API Keys (passed from .env file)
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
+      - LANGSMITH_ENDPOINT=${LANGSMITH_ENDPOINT}
+      - LANGCHAIN_TRACING_V2=true
+      - LANGCHAIN_PROJECT="lyfx_agents_prod"
+      - TAVILY_API_KEY=${TAVILY_API_KEY}
+      - SCRAPINGBEE_API_KEY=${SCRAPINGBEE_API_KEY}
+      - SCRAPINGBEE_ENDPOINT=${SCRAPINGBEE_ENDPOINT}
+      - LYFX_EMAIL_KEY=${LYFX_EMAIL_KEY}
+
+      # Celery configuration
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:

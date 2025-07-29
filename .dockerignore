@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+test_req/
+
+# VERY IMPORTANT TO IGNORE
+.env
+
+# Django
+*.log
+*.pot
+*.pyc
+local_settings.py
+db.sqlite3
+checkpoints.sqlite*
+media/
+staticfiles/
+static/
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Node (for Tailwind)
+node_modules/
+npm-debug.log
+
+# Temporary
+*.tmp
+*.bak
+*.backup
+postgres_data_dev/
+postgres_data_prod/

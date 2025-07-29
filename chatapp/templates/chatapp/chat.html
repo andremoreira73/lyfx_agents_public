@@ -1,0 +1,400 @@
+{% extends "base_generic.html" %} {% load static %} {% block content %}
+
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Chat Container -->
+    <div
+      class="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden"
+    >
+      <!-- Chat Header -->
+      <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-6">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div
+              class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center"
+            >
+              <svg
+                class="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                ></path>
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-white">AI Assistant</h2>
+              <div class="flex items-center text-blue-100 text-sm">
+                <div
+                  class="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"
+                ></div>
+                Online
+              </div>
+            </div>
+          </div>
+          <button
+            class="text-white/80 hover:text-white transition-colors duration-200"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+              ></path>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+              ></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Chat Messages Area -->
+      <div
+        id="chat-window"
+        class="h-96 md:h-[32rem] overflow-y-auto bg-gray-50/50"
+      >
+        <div class="p-6 space-y-4" id="chat-messages">
+          <!-- Display the assistant's greeting message -->
+          <div class="flex justify-start">
+            <div class="flex items-start space-x-3 max-w-3xl">
+              <div
+                class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center flex-shrink-0"
+              >
+                <svg
+                  class="w-4 h-4 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                  ></path>
+                </svg>
+              </div>
+              <div
+                class="bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm border border-gray-200 assistant-message"
+              >
+                <p class="text-gray-800 leading-relaxed">
+                  {{ greeting_message }}
+                </p>
+                <div class="text-xs text-gray-500 mt-2">Just now</div>
+              </div>
+            </div>
+          </div>
+          <!-- Messages will be appended here -->
+        </div>
+      </div>
+
+      <!-- Loading Indicator -->
+      <div
+        id="loading-indicator"
+        class="px-6 py-4 border-t border-gray-100 bg-white"
+        style="display: none"
+      >
+        <div class="flex items-center justify-center space-x-3">
+          <div class="flex space-x-1">
+            <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+            <div
+              class="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+              style="animation-delay: 0.1s"
+            ></div>
+            <div
+              class="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+              style="animation-delay: 0.2s"
+            ></div>
+          </div>
+          <span class="text-sm text-gray-600">AI is thinking...</span>
+        </div>
+      </div>
+
+      <!-- Cancel Button -->
+      <div
+        class="px-6 py-2 border-t border-gray-100 bg-white"
+        id="cancel-container"
+        style="display: none"
+      >
+        <div class="flex justify-center">
+          <button
+            id="cancel-request"
+            class="inline-flex items-center px-4 py-2 bg-yellow-100 hover:bg-yellow-200 text-yellow-800 text-sm font-medium rounded-lg border border-yellow-300 transition-colors duration-200"
+          >
+            <svg
+              class="w-4 h-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              ></path>
+            </svg>
+            Cancel Request
+          </button>
+        </div>
+      </div>
+
+      <!-- Chat Input Area -->
+      <div class="p-6 bg-white border-t border-gray-100">
+        <form id="chat-form" method="post">
+          {% csrf_token %}
+          <div class="flex items-end space-x-4">
+            <!-- Message Input -->
+            <div class="flex-1 relative">
+              <textarea
+                name="message"
+                id="chat-input"
+                rows="1"
+                autocomplete="off"
+                placeholder="Type your message..."
+                class="w-full px-4 py-3 pr-12 bg-gray-50 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none transition-all duration-200 max-h-32"
+              ></textarea>
+
+              <!-- Emoji Button -->
+              <button
+                type="button"
+                class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Send Button -->
+            <button
+              type="submit"
+              class="group bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white p-3 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+              id="send-button"
+            >
+              <svg
+                class="w-5 h-5 group-hover:translate-x-0.5 transition-transform duration-200"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                ></path>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Input Helper Text -->
+          <div
+            class="flex items-center justify-between mt-3 text-xs text-gray-500"
+          >
+            <span>Press Enter to send, Shift+Enter for new line</span>
+            <span id="char-count" class="hidden">0 / 1000</span>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Chat Tips -->
+    <div class="mt-6 bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+      <div class="flex items-start space-x-3">
+        <div
+          class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0"
+        >
+          <svg
+            class="w-4 h-4 text-blue-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            ></path>
+          </svg>
+        </div>
+        <div>
+          <h4 class="text-sm font-semibold text-gray-800 mb-1">Chat Tips</h4>
+          <ul class="text-sm text-gray-600 space-y-1">
+            <li>• Be clear and specific with your questions</li>
+            <li>• You can ask follow-up questions to dive deeper</li>
+            <li>• The AI assistant is here to help with various tasks</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Custom Styles -->
+<style>
+  /* Message Styling */
+  .assistant-message {
+    animation: slideInLeft 0.3s ease-out;
+  }
+
+  .user-message {
+    animation: slideInRight 0.3s ease-out;
+  }
+
+  .system-message {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border: 2px dashed #cbd5e1;
+    font-style: italic;
+    text-align: center;
+    padding: 12px 16px;
+    border-radius: 12px;
+    margin: 16px auto;
+    max-width: 80%;
+    font-size: 0.875rem;
+    color: #64748b;
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  /* Animations */
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Auto-resize textarea */
+  #chat-input {
+    field-sizing: content;
+  }
+
+  /* Custom scrollbar */
+  #chat-window::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  #chat-window::-webkit-scrollbar-track {
+    background: #f1f5f9;
+  }
+
+  #chat-window::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+  }
+
+  #chat-window::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+</style>
+
+<!-- Auto-resize textarea script -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const textarea = document.getElementById("chat-input");
+    const charCount = document.getElementById("char-count");
+    const maxChars = 1000;
+
+    // Auto-resize textarea
+    textarea.addEventListener("input", function () {
+      this.style.height = "auto";
+      this.style.height = Math.min(this.scrollHeight, 128) + "px";
+
+      // Character count
+      const count = this.value.length;
+      if (count > 0) {
+        charCount.textContent = `${count} / ${maxChars}`;
+        charCount.classList.remove("hidden");
+      } else {
+        charCount.classList.add("hidden");
+      }
+
+      // Warn if approaching limit
+      if (count > maxChars * 0.8) {
+        charCount.classList.add("text-yellow-600");
+      } else {
+        charCount.classList.remove("text-yellow-600");
+      }
+    });
+
+    // Handle Enter key
+    textarea.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        document.getElementById("chat-form").dispatchEvent(new Event("submit"));
+      }
+    });
+
+    // Show/hide loading and cancel states
+    const loadingIndicator = document.getElementById("loading-indicator");
+    const cancelContainer = document.getElementById("cancel-container");
+
+    // Update the existing JavaScript to work with new elements
+    window.showLoading = function () {
+      loadingIndicator.style.display = "block";
+      cancelContainer.style.display = "block";
+    };
+
+    window.hideLoading = function () {
+      loadingIndicator.style.display = "none";
+      cancelContainer.style.display = "none";
+    };
+  });
+</script>
+
+<!-- Include the shared async chat functionality -->
+<script src="{% static 'js/chat_async.js' %}"></script>
+
+{% endblock %}

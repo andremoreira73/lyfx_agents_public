@@ -1,0 +1,47 @@
+# Environment
+.env
+.venv
+env/
+venv/
+.env.prod
+
+# General
+My_notes.md
+set_up_chat_new.md
+
+# Database
+db.sqlite3
+checkpoints.sqlite*
+data_backup.json
+
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.so
+.Python
+
+# Django
+static/
+media/
+*.log
+
+# Jupyter
+*.ipynb
+.ipynb_checkpoints/
+dev_NBs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node.js (for Tailwind)
+node_modules/
+npm-debug.log*

@@ -1,0 +1,875 @@
+{% extends "base_generic.html" %} {% load static %} {% block extra_css %}
+<link rel="stylesheet" href="{% static 'agent_chat/css/custom.css' %}" />
+{% endblock %} {% block content %}
+<!-- HTMX CDN -->
+<script src="https://unpkg.com/htmx.org@1.9.9"></script>
+
+<!-- Modern Tailwind-inspired styles -->
+<style>
+  .chat-wrapper {
+    margin-top: -1rem;
+    height: calc(100vh - 66px);
+  }
+
+  /* Modern color variables */
+  :root {
+    --lyfx-primary: #3b82f6;
+    --lyfx-primary-hover: #2563eb;
+    --lyfx-secondary: #6366f1;
+    --lyfx-accent: #8b5cf6;
+    --lyfx-red: #ef4444;
+    --lyfx-red-hover: #dc2626;
+    --lyfx-gray-900: #111827;
+    --lyfx-gray-800: #1f2937;
+    --lyfx-gray-700: #374151;
+    --lyfx-gray-600: #4b5563;
+    --lyfx-gray-500: #6b7280;
+    --lyfx-gray-400: #9ca3af;
+    --lyfx-gray-300: #d1d5db;
+    --lyfx-gray-200: #e5e7eb;
+    --lyfx-gray-100: #f3f4f6;
+    --lyfx-gray-50: #f9fafb;
+  }
+
+  /* Main container styles */
+  .chat-container {
+    display: flex;
+    height: 100%;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  }
+
+  .chat-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background: white;
+    border-radius: 0;
+  }
+
+  /* Modern header styling */
+  .chat-header {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-bottom: 1px solid var(--lyfx-gray-200);
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  }
+
+  /* Enhanced message area */
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    background: #fefefe;
+    background-image: radial-gradient(
+        circle at 25px 25px,
+        rgba(59, 130, 246, 0.1) 2px,
+        transparent 0
+      ),
+      radial-gradient(
+        circle at 75px 75px,
+        rgba(99, 102, 241, 0.1) 2px,
+        transparent 0
+      );
+    background-size: 100px 100px;
+  }
+
+  /* Modern message styling */
+  .message-user {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1.25rem;
+  }
+
+  .message-assistant {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 1.25rem;
+  }
+
+  .message-bubble {
+    max-width: 28rem;
+    padding: 1rem 1.25rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    position: relative;
+    animation: messageSlideIn 0.3s ease-out;
+  }
+
+  .message-bubble-user {
+    background: linear-gradient(
+      135deg,
+      var(--lyfx-primary) 0%,
+      var(--lyfx-secondary) 100%
+    );
+    color: white;
+    border-bottom-right-radius: 0.5rem;
+  }
+
+  .message-bubble-assistant {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    color: var(--lyfx-gray-800);
+    border: 1px solid var(--lyfx-gray-200);
+    border-bottom-left-radius: 0.5rem;
+  }
+
+  .message-bubble-error {
+    background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+  }
+
+  /* Enhanced input area */
+  .chat-input-area {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-top: 1px solid var(--lyfx-gray-200);
+    padding: 1.5rem;
+    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 -2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  .chat-textarea {
+    width: 100%;
+    resize: none;
+    border-radius: 1rem;
+    border: 2px solid var(--lyfx-gray-200);
+    padding: 0.875rem 1.25rem;
+    outline: none;
+    transition: all 0.2s ease;
+    background: white;
+    color: var(--lyfx-gray-800);
+    font-size: 0.95rem;
+  }
+
+  .chat-textarea:focus {
+    border-color: var(--lyfx-primary);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    transform: translateY(-1px);
+  }
+
+  .chat-send-button {
+    padding: 0.875rem 1.5rem;
+    background: linear-gradient(
+      135deg,
+      var(--lyfx-primary) 0%,
+      var(--lyfx-secondary) 100%
+    );
+    color: white;
+    border-radius: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  .chat-send-button:hover:not(:disabled) {
+    background: linear-gradient(
+      135deg,
+      var(--lyfx-primary-hover) 0%,
+      var(--lyfx-accent) 100%
+    );
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
+  .chat-send-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Modern status indicators */
+  .status-indicator {
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8);
+  }
+
+  .status-ready {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    animation: pulse 2s infinite;
+  }
+
+  .status-connected {
+    background: linear-gradient(
+      135deg,
+      var(--lyfx-primary) 0%,
+      var(--lyfx-secondary) 100%
+    );
+    animation: pulse 2s infinite;
+  }
+
+  .status-error {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    animation: pulse 2s infinite;
+  }
+
+  /* Loading indicator enhancement */
+  #loading-indicator {
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 1rem;
+    margin: 0 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Animations */
+  @keyframes messageSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+
+  /* Scrollbar styling */
+  .chat-messages::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .chat-messages::-webkit-scrollbar-track {
+    background: var(--lyfx-gray-100);
+    border-radius: 4px;
+  }
+
+  .chat-messages::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      135deg,
+      var(--lyfx-gray-400) 0%,
+      var(--lyfx-gray-500) 100%
+    );
+    border-radius: 4px;
+  }
+
+  .chat-messages::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(
+      135deg,
+      var(--lyfx-gray-500) 0%,
+      var(--lyfx-gray-600) 100%
+    );
+  }
+</style>
+
+<div class="chat-wrapper">
+  <div class="chat-container">
+    <!-- Main Chat Area -->
+    <div class="chat-main">
+      <!-- Agent Info Header -->
+      <div class="chat-header">
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+          "
+        >
+          <div style="display: flex; align-items: center; gap: 1rem">
+            <div style="display: flex; align-items: center; gap: 0.75rem">
+              <div
+                style="
+                  width: 3rem;
+                  height: 3rem;
+                  background: linear-gradient(
+                    135deg,
+                    var(--lyfx-primary) 0%,
+                    var(--lyfx-secondary) 100%
+                  );
+                  border-radius: 1rem;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                "
+              >
+                <svg
+                  style="width: 1.5rem; height: 1.5rem; color: white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                  ></path>
+                </svg>
+              </div>
+              <div>
+                <h1
+                  style="
+                    font-size: 1.25rem;
+                    font-weight: 700;
+                    color: var(--lyfx-gray-900);
+                    margin: 0;
+                  "
+                >
+                  {{ agent_name }}
+                </h1>
+                <p
+                  style="
+                    font-size: 0.875rem;
+                    color: var(--lyfx-gray-600);
+                    margin: 0;
+                  "
+                >
+                  {{ agent.description|default:"AI Assistant" }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 1rem">
+            <!-- Help Link -->
+            {% if help_content_exists %}
+            <a
+              href="{% url 'agent_chat:help' agent_name %}"
+              target="_blank"
+              style="
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.5rem 0.75rem;
+                background: rgba(255, 255, 255, 0.8);
+                border: 1px solid var(--lyfx-gray-200);
+                border-radius: 0.5rem;
+                text-decoration: none;
+                color: var(--lyfx-gray-700);
+                font-size: 0.875rem;
+                font-weight: 500;
+                transition: all 0.2s ease;
+              "
+              onmouseover="this.style.background='rgba(255, 255, 255, 1)'; this.style.borderColor='var(--lyfx-blue-300)'; this.style.color='var(--lyfx-primary)'"
+              onmouseout="this.style.background='rgba(255, 255, 255, 0.8)'; this.style.borderColor='var(--lyfx-gray-200)'; this.style.color='var(--lyfx-gray-700)'"
+            >
+              <span>Help</span>
+              <span>🔗</span>
+            </a>
+            {% endif %}
+
+            <!-- Status Indicator -->
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                background: rgba(255, 255, 255, 0.8);
+                padding: 0.75rem 1rem;
+                border-radius: 1rem;
+                border: 1px solid var(--lyfx-gray-200);
+              "
+            >
+              <span
+                id="connection-status"
+                style="
+                  font-size: 0.875rem;
+                  color: var(--lyfx-gray-700);
+                  font-weight: 500;
+                "
+              >
+                Ready
+              </span>
+              <div
+                id="status-indicator"
+                class="status-indicator status-ready"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Messages -->
+      <div id="chat-container" class="chat-messages">
+        <!-- Greeting Message -->
+        <div class="message-assistant">
+          <div class="message-bubble message-bubble-assistant">
+            {{ greeting_message }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading Indicator -->
+      <div id="loading-indicator" style="display: none">
+        <div
+          style="
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.75rem;
+          "
+        >
+          <div style="display: flex; gap: 0.25rem">
+            <div
+              style="
+                width: 0.5rem;
+                height: 0.5rem;
+                background: var(--lyfx-primary);
+                border-radius: 50%;
+                animation: bounce 1.4s infinite ease-in-out both;
+              "
+            ></div>
+            <div
+              style="
+                width: 0.5rem;
+                height: 0.5rem;
+                background: var(--lyfx-secondary);
+                border-radius: 50%;
+                animation: bounce 1.4s infinite ease-in-out both;
+                animation-delay: -0.32s;
+              "
+            ></div>
+            <div
+              style="
+                width: 0.5rem;
+                height: 0.5rem;
+                background: var(--lyfx-accent);
+                border-radius: 50%;
+                animation: bounce 1.4s infinite ease-in-out both;
+                animation-delay: -0.16s;
+              "
+            ></div>
+          </div>
+          <span
+            style="
+              font-size: 0.875rem;
+              color: var(--lyfx-gray-600);
+              font-weight: 500;
+            "
+            >AI is thinking...</span
+          >
+        </div>
+      </div>
+
+      <!-- Input Area -->
+      <!-- Input Area -->
+      <div class="chat-input-area">
+        <form id="chat-form" style="display: flex; gap: 1rem; align-items: end">
+          {% csrf_token %}
+          <div style="flex: 1">
+            <!-- Example suggestion (only shows if example exists and no message typed) -->
+            {% if agent.example_message %}
+            <div
+              id="example-suggestion"
+              style="margin-bottom: 0.5rem; display: none"
+            >
+              <button
+                type="button"
+                onclick="useExample()"
+                style="
+                  font-size: 0.75rem;
+                  color: var(--lyfx-primary);
+                  background: none;
+                  border: none;
+                  cursor: pointer;
+                  text-decoration: underline;
+                  padding: 0;
+                "
+                onmouseover="this.style.color='var(--lyfx-primary-hover)'"
+                onmouseout="this.style.color='var(--lyfx-primary)'"
+              >
+                💡 Try this example: "{{ agent.example_message }}"
+              </button>
+            </div>
+            {% endif %}
+
+            <textarea
+              id="message-input"
+              name="message"
+              rows="1"
+              placeholder="{{ placeholder_text }}"
+              class="chat-textarea"
+              style="min-height: 48px; max-height: 120px"
+            ></textarea>
+          </div>
+          <button
+            type="submit"
+            id="send-button"
+            class="chat-send-button"
+            style="display: flex; align-items: center; gap: 0.5rem"
+          >
+            <svg
+              style="width: 1.25rem; height: 1.25rem"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+              ></path>
+            </svg>
+            <span style="font-weight: 500">Send</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes bounce {
+    0%,
+    80%,
+    100% {
+      transform: scale(0);
+    }
+    40% {
+      transform: scale(1);
+    }
+  }
+</style>
+
+<script>
+    // Chat configuration
+    const CHAT_CONFIG = {
+      agentName: "{{ agent_name }}",
+      apiBaseUrl: "{{ api_base_url }}",
+      csrfToken: "{{ csrf_token }}",
+    };
+
+    // Global variables
+    let currentThreadId = null;
+    let currentRunId = null;
+    let currentRunStatus = null;
+    let eventSource = null;
+    let isProcessing = false;
+    let displayedMessageIds = new Set(); // Track displayed messages to prevent duplicates
+
+    // DOM elements
+    const chatContainer = document.getElementById("chat-container");
+    const messageInput = document.getElementById("message-input");
+    const sendButton = document.getElementById("send-button");
+    const loadingIndicator = document.getElementById("loading-indicator");
+    const connectionStatus = document.getElementById("connection-status");
+    const statusIndicator = document.getElementById("status-indicator");
+
+    // Auto-resize textarea
+    messageInput.addEventListener("input", function () {
+      this.style.height = "48px";
+      this.style.height = Math.min(this.scrollHeight, 120) + "px";
+    });
+
+    // Handle form submission
+    document
+      .getElementById("chat-form")
+      .addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const message = messageInput.value.trim();
+        if (!message || isProcessing) return;
+
+        // Add user message to chat
+        addMessage("user", message);
+        messageInput.value = "";
+        messageInput.style.height = "48px";
+
+        // Start processing
+        setProcessingState(true);
+
+        try {
+          await sendMessage(message);
+        } catch (error) {
+          console.error("Error sending message:", error);
+          addMessage("error", "Sorry, something went wrong. Please try again.");
+          setProcessingState(false);
+        }
+      });
+
+    // Send message to API
+    async function sendMessage(message) {
+      try {
+        // Create thread if needed
+        if (!currentThreadId) {
+          const threadResponse = await fetch(
+            `${CHAT_CONFIG.apiBaseUrl}/threads`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": CHAT_CONFIG.csrfToken,
+              },
+              body: JSON.stringify({ metadata: {} }),
+            }
+          );
+
+          if (!threadResponse.ok) throw new Error("Failed to create thread");
+          const threadData = await threadResponse.json();
+          currentThreadId = threadData.id;
+        }
+
+        // Add message to thread
+        const messageResponse = await fetch(
+          `${CHAT_CONFIG.apiBaseUrl}/threads/${currentThreadId}/messages`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": CHAT_CONFIG.csrfToken,
+            },
+            body: JSON.stringify({
+              role: "user",
+              content: message,
+            }),
+          }
+        );
+
+        if (!messageResponse.ok) throw new Error("Failed to add message");
+
+        // Check if we have an interrupted run to resume
+        if (currentRunId && currentRunStatus === "requires_action") {
+          // Resume interrupted run
+          const resumeResponse = await fetch(
+            `${CHAT_CONFIG.apiBaseUrl}/runs/${currentRunId}/submit_tool_outputs`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": CHAT_CONFIG.csrfToken,
+              },
+              body: JSON.stringify({
+                tool_outputs: [{ type: "text", content: message }],
+              }),
+            }
+          );
+
+          if (!resumeResponse.ok) throw new Error("Failed to resume run");
+
+          // Start SSE to listen for updates
+          startEventStream();
+        } else {
+          // Create new run
+          const runResponse = await fetch(
+            `${CHAT_CONFIG.apiBaseUrl}/threads/${currentThreadId}/runs`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": CHAT_CONFIG.csrfToken,
+              },
+              body: JSON.stringify({
+                assistant_id: CHAT_CONFIG.agentName,
+              }),
+            }
+          );
+
+          if (!runResponse.ok) throw new Error("Failed to create run");
+          const runData = await runResponse.json();
+          currentRunId = runData.id;
+          currentRunStatus = "queued";
+
+          // Start SSE connection
+          startEventStream();
+        }
+      } catch (error) {
+        console.error("API Error:", error);
+        throw error;
+      }
+    }
+
+    // Start Server-Sent Events stream
+    function startEventStream() {
+      if (eventSource) {
+        eventSource.close();
+      }
+
+      updateConnectionStatus("connected");
+
+      eventSource = new EventSource(
+        `${CHAT_CONFIG.apiBaseUrl}/threads/${currentThreadId}/runs/${currentRunId}/events`
+      );
+
+      eventSource.onmessage = function (event) {
+        try {
+          const data = JSON.parse(event.data);
+          handleStreamEvent(data);
+        } catch (error) {
+          console.error("Error parsing SSE data:", error);
+        }
+      };
+
+      eventSource.onerror = function (error) {
+        console.error("SSE Error:", error);
+        updateConnectionStatus("error");
+        setProcessingState(false);
+      };
+
+      eventSource.onopen = function () {
+        updateConnectionStatus("connected");
+      };
+    }
+
+    // Handle stream events
+    function handleStreamEvent(data) {
+      console.log("Stream event:", data);
+
+      switch (data.type) {
+        case "message.created":
+          if (data.data.role === "assistant") {
+            // Check if we've already displayed this message
+            const messageId = data.data.id;
+            if (!displayedMessageIds.has(messageId)) {
+              displayedMessageIds.add(messageId);
+              addMessage("assistant", data.data.content, messageId);
+            } else {
+              console.log("Skipping duplicate message:", messageId);
+            }
+          }
+          break;
+
+        case "run.status":
+          currentRunStatus = data.data.status;
+          if (data.data.status === "completed") {
+            setProcessingState(false);
+            updateConnectionStatus("ready");
+            if (eventSource) {
+              eventSource.close();
+              eventSource = null;
+            }
+          } else if (data.data.status === "requires_action") {
+            // Handle interrupts - ready for more user input
+            handleInterrupt();
+          }
+          break;
+
+        case "error":
+          addMessage("error", data.data.message || "An error occurred");
+          setProcessingState(false);
+          break;
+      }
+    }
+
+    // Handle workflow interrupts
+    function handleInterrupt() {
+      setProcessingState(false);
+      updateConnectionStatus("ready");
+      currentRunStatus = "requires_action"; // Track that we're waiting for user input
+      if (eventSource) {
+        eventSource.close();
+        eventSource = null;
+      }
+    }
+
+    // Add message to chat
+    function addMessage(role, content, messageId = null) {
+      const messageDiv = document.createElement("div");
+      messageDiv.className =
+        role === "user" ? "message-user" : "message-assistant";
+
+      // Add unique ID to prevent duplicates if provided
+      if (messageId) {
+        messageDiv.setAttribute("data-message-id", messageId);
+      }
+
+      const bubbleClass =
+        role === "user"
+          ? "message-bubble-user"
+          : role === "error"
+          ? "message-bubble-error"
+          : "message-bubble-assistant";
+
+      messageDiv.innerHTML = `
+        <div class="message-bubble ${bubbleClass}">
+          ${content}
+        </div>
+      `;
+
+      chatContainer.appendChild(messageDiv);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    // Set processing state
+    function setProcessingState(processing) {
+      isProcessing = processing;
+      sendButton.disabled = processing;
+      messageInput.disabled = processing;
+
+      if (processing) {
+        loadingIndicator.style.display = "block";
+      } else {
+        loadingIndicator.style.display = "none";
+      }
+    }
+
+    // Update connection status
+    function updateConnectionStatus(status) {
+      const statusText = {
+        ready: "Ready",
+        connected: "Connected",
+        error: "Connection Error",
+      };
+
+      connectionStatus.textContent = statusText[status] || status;
+      statusIndicator.className = "status-indicator status-" + status;
+    }
+
+    // Handle Enter key in textarea
+    messageInput.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        document.getElementById("chat-form").dispatchEvent(new Event("submit"));
+      }
+    });
+
+    // Initialize
+    document.addEventListener("DOMContentLoaded", function () {
+      updateConnectionStatus("ready");
+      messageInput.focus();
+    });
+
+    // Example message functionality
+  {% if agent.example_message %}
+  const exampleMessage = "{{ agent.example_message }}";
+  const exampleSuggestion = document.getElementById('example-suggestion');
+
+  // Show example suggestion when input is empty
+  messageInput.addEventListener('input', function() {
+    if (this.value.trim() === '' && exampleSuggestion) {
+      exampleSuggestion.style.display = 'block';
+    } else if (exampleSuggestion) {
+      exampleSuggestion.style.display = 'none';
+    }
+  });
+
+  // Show example on page load if input is empty
+  document.addEventListener('DOMContentLoaded', function() {
+    if (messageInput.value.trim() === '' && exampleSuggestion) {
+      exampleSuggestion.style.display = 'block';
+    }
+  });
+
+  function useExample() {
+    messageInput.value = exampleMessage;
+    messageInput.focus();
+    messageInput.style.height = '48px';
+    messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
+    if (exampleSuggestion) {
+      exampleSuggestion.style.display = 'none';
+    }
+  }
+  {% endif %}
+</script>
+
+{% endblock %}

@@ -1,0 +1,721 @@
+{% extends "base_generic.html" %} {% load static %} {% block content %}
+
+<!-- Modern Tailwind-inspired styles -->
+<style>
+  /* Modern color variables */
+  :root {
+    --lyfx-primary: #3b82f6;
+    --lyfx-primary-hover: #2563eb;
+    --lyfx-secondary: #6366f1;
+    --lyfx-accent: #8b5cf6;
+    --lyfx-gray-900: #111827;
+    --lyfx-gray-800: #1f2937;
+    --lyfx-gray-700: #374151;
+    --lyfx-gray-600: #4b5563;
+    --lyfx-gray-500: #6b7280;
+    --lyfx-gray-400: #9ca3af;
+    --lyfx-gray-300: #d1d5db;
+    --lyfx-gray-200: #e5e7eb;
+    --lyfx-gray-100: #f3f4f6;
+    --lyfx-gray-50: #f9fafb;
+  }
+
+  .chat-container {
+    height: calc(100vh - 80px);
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  }
+
+  .markdown-panel {
+    transition: all 0.3s ease-in-out;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+      0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border-right: 1px solid var(--lyfx-gray-200);
+    position: relative;
+    /* width: 20rem; /* 320px - 80 * 4 */
+    width: 66%;
+    flex-shrink: 0;
+  }
+
+  .markdown-panel.closed {
+    width: 0;
+    overflow: hidden;
+    box-shadow: none;
+    border-right: none;
+  }
+
+  .chat-main {
+    transition: all 0.3s ease-in-out;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    flex: 1;
+    min-width: 0;
+  }
+
+  .message-bubble {
+    max-width: 28rem;
+    padding: 1rem 1.25rem;
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    position: relative;
+    animation: messageSlideIn 0.3s ease-out;
+  }
+
+  .message-bubble-user {
+    background: linear-gradient(
+      135deg,
+      var(--lyfx-primary) 0%,
+      var(--lyfx-secondary) 100%
+    );
+    color: white;
+    border-bottom-right-radius: 0.5rem;
+  }
+
+  .message-bubble-assistant {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    color: var(--lyfx-gray-800);
+    border: 1px solid var(--lyfx-gray-200);
+    border-bottom-left-radius: 0.5rem;
+  }
+
+  .chat-textarea {
+    resize: none;
+    border-radius: 1rem;
+    border: 2px solid var(--lyfx-gray-200);
+    transition: all 0.2s ease;
+    background: white;
+  }
+
+  .chat-textarea:focus {
+    border-color: var(--lyfx-primary);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    outline: none;
+  }
+
+  .toggle-button {
+    background: linear-gradient(
+      135deg,
+      var(--lyfx-primary) 0%,
+      var(--lyfx-secondary) 100%
+    );
+    transition: all 0.2s ease;
+  }
+
+  .toggle-button:hover {
+    background: linear-gradient(
+      135deg,
+      var(--lyfx-primary-hover) 0%,
+      var(--lyfx-accent) 100%
+    );
+    transform: translateY(-1px);
+  }
+
+  @keyframes messageSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes bounce {
+    0%,
+    80%,
+    100% {
+      transform: scale(0);
+    }
+    40% {
+      transform: scale(1);
+    }
+  }
+
+  .loading-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+  }
+
+  .loading-dot:nth-child(1) {
+    background: var(--lyfx-primary);
+  }
+  .loading-dot:nth-child(2) {
+    background: var(--lyfx-secondary);
+    animation-delay: -0.32s;
+  }
+  .loading-dot:nth-child(3) {
+    background: var(--lyfx-accent);
+    animation-delay: -0.16s;
+  }
+
+  /* Custom Markdown Styling */
+  .markdown-content {
+    color: var(--lyfx-gray-700);
+    line-height: 1.7;
+  }
+
+  .markdown-content h1,
+  .markdown-content h2,
+  .markdown-content h3,
+  .markdown-content h4,
+  .markdown-content h5,
+  .markdown-content h6 {
+    color: var(--lyfx-gray-900);
+    font-weight: 700;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+  }
+
+  .markdown-content h1 {
+    font-size: 1.5rem;
+  }
+  .markdown-content h2 {
+    font-size: 1.25rem;
+  }
+  .markdown-content h3 {
+    font-size: 1.125rem;
+  }
+  .markdown-content h4 {
+    font-size: 1rem;
+  }
+
+  .markdown-content p {
+    margin-bottom: 1rem;
+  }
+
+  .markdown-content ul,
+  .markdown-content ol {
+    margin-bottom: 1rem;
+    padding-left: 1.5rem;
+  }
+
+  .markdown-content li {
+    margin-bottom: 0.25rem;
+  }
+
+  .markdown-content a {
+    color: var(--lyfx-primary);
+    text-decoration: underline;
+    transition: color 0.2s ease;
+  }
+
+  .markdown-content a:hover {
+    color: var(--lyfx-primary-hover);
+  }
+
+  .markdown-content strong {
+    font-weight: 600;
+    color: var(--lyfx-gray-900);
+  }
+
+  .markdown-content em {
+    font-style: italic;
+  }
+
+  .markdown-content code {
+    background: var(--lyfx-gray-100);
+    color: var(--lyfx-gray-800);
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+    font-family: "Monaco", "Courier New", monospace;
+  }
+
+  .markdown-content pre {
+    background: var(--lyfx-gray-100);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin-bottom: 1rem;
+  }
+
+  .markdown-content blockquote {
+    border-left: 4px solid var(--lyfx-primary);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: var(--lyfx-gray-600);
+    font-style: italic;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 1023px) {
+    .chat-container {
+      position: relative;
+    }
+
+    .markdown-panel {
+      position: fixed;
+      top: 80px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 50;
+      width: 100% !important;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .markdown-panel.closed {
+      transform: translateX(-100%);
+      width: 100% !important;
+      overflow: hidden;
+    }
+
+    .markdown-panel.open {
+      transform: translateX(0);
+      width: 100% !important;
+      overflow-y: auto;
+    }
+
+    .chat-main {
+      width: 100% !important;
+      flex: none !important;
+    }
+
+    .toggle-button {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      z-index: 60;
+    }
+  }
+</style>
+
+<div class="chat-container flex relative">
+  <!-- Markdown Information Panel -->
+  <div id="markdown-panel" class="markdown-panel h-full overflow-y-auto">
+    <div class="p-6">
+      <!-- Panel Header -->
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center space-x-3">
+          <div
+            class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center"
+          >
+            <svg
+              class="w-5 h-5 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              ></path>
+            </svg>
+          </div>
+          <h2 class="text-xl font-bold text-gray-900">{{ agent_name }}</h2>
+        </div>
+        <button
+          id="close-panel"
+          class="lg:hidden w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+        >
+          <svg
+            class="w-4 h-4 text-gray-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Content -->
+      <div class="markdown-content">{{ html_content|safe }}</div>
+    </div>
+  </div>
+
+  <!-- Overlay for mobile -->
+  <div
+    id="panel-overlay"
+    class="fixed inset-0 bg-black bg-opacity-50 z-30 hidden lg:hidden"
+  ></div>
+
+  <!-- Main Chat Area -->
+  <div id="chat-main" class="chat-main flex flex-col">
+    <!-- Chat Header -->
+    <div class="bg-white border-b border-gray-200 px-6 py-4 shadow-sm">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div
+            class="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center"
+          >
+            <svg
+              class="w-5 h-5 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+              ></path>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-lg font-semibold text-gray-900">
+              {{ agent_name }}
+            </h1>
+            <p class="text-sm text-gray-500">AI Assistant</p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-3">
+          <div
+            class="flex items-center space-x-2 bg-green-50 px-3 py-1.5 rounded-full"
+          >
+            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <span class="text-sm font-medium text-green-700">Ready</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages Container -->
+    <div
+      id="chat-messages"
+      class="flex-1 overflow-y-auto p-6 space-y-4 bg-gradient-to-br from-gray-50 to-blue-50/30"
+    >
+      <!-- Greeting Message -->
+      <div class="flex justify-start">
+        <div class="message-bubble message-bubble-assistant">
+          {{ greeting_message }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loading-indicator" class="hidden px-6 py-4">
+      <div
+        class="flex items-center justify-center space-x-2 bg-white rounded-xl p-4 shadow-sm"
+      >
+        <div class="flex space-x-1">
+          <div class="loading-dot"></div>
+          <div class="loading-dot"></div>
+          <div class="loading-dot"></div>
+        </div>
+        <span class="text-sm font-medium text-gray-600 ml-3"
+          >AI is thinking...</span
+        >
+      </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="bg-white border-t border-gray-200 p-6">
+      <form id="chat-form" class="flex space-x-4">
+        <input
+          type="hidden"
+          name="csrfmiddlewaretoken"
+          value="{{ csrf_token }}"
+        />
+        <div class="flex-1">
+          <textarea
+            id="message-input"
+            name="message"
+            rows="1"
+            placeholder="Type your message..."
+            class="chat-textarea w-full px-4 py-3 text-sm resize-none"
+            style="min-height: 48px; max-height: 120px"
+          ></textarea>
+        </div>
+        <button
+          type="submit"
+          id="send-button"
+          class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center space-x-2"
+        >
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+            ></path>
+          </svg>
+          <span>Send</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toggle Button -->
+  <button
+    id="toggle-button"
+    class="toggle-button fixed bottom-6 left-6 w-12 h-12 rounded-full text-white shadow-lg z-50 flex items-center justify-center lg:bottom-6 lg:left-6"
+  >
+    <svg
+      id="toggle-icon"
+      class="w-5 h-5 transition-transform duration-200"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M11 19l-7-7m0 0l7-7m-7 7h18"
+      ></path>
+    </svg>
+  </button>
+</div>
+
+<script>
+  // Chat functionality
+  class ModernChatPlus {
+    constructor() {
+      this.isProcessing = false;
+      this.initializeElements();
+      this.bindEvents();
+      this.setupAutoResize();
+    }
+
+    initializeElements() {
+      this.chatForm = document.getElementById("chat-form");
+      this.messageInput = document.getElementById("message-input");
+      this.sendButton = document.getElementById("send-button");
+      this.chatMessages = document.getElementById("chat-messages");
+      this.loadingIndicator = document.getElementById("loading-indicator");
+      this.toggleButton = document.getElementById("toggle-button");
+      this.toggleIcon = document.getElementById("toggle-icon");
+      this.markdownPanel = document.getElementById("markdown-panel");
+      this.chatMain = document.getElementById("chat-main");
+      this.panelOverlay = document.getElementById("panel-overlay");
+      this.closePanel = document.getElementById("close-panel");
+    }
+
+    bindEvents() {
+      // Form submission
+      this.chatForm.addEventListener("submit", (e) => this.handleSubmit(e));
+
+      // Toggle panel
+      this.toggleButton.addEventListener("click", () => this.togglePanel());
+      if (this.closePanel) {
+        this.closePanel.addEventListener("click", () =>
+          this.closeMarkdownPanel()
+        );
+      }
+      if (this.panelOverlay) {
+        this.panelOverlay.addEventListener("click", () =>
+          this.closeMarkdownPanel()
+        );
+      }
+
+      // Enter key handling
+      this.messageInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          this.chatForm.dispatchEvent(new Event("submit"));
+        }
+      });
+    }
+
+    setupAutoResize() {
+      this.messageInput.addEventListener("input", () => {
+        this.messageInput.style.height = "48px";
+        this.messageInput.style.height =
+          Math.min(this.messageInput.scrollHeight, 120) + "px";
+      });
+    }
+
+    async handleSubmit(e) {
+      e.preventDefault();
+
+      const message = this.messageInput.value.trim();
+      if (!message || this.isProcessing) return;
+
+      // Add user message
+      this.addMessage("user", message);
+      this.messageInput.value = "";
+      this.messageInput.style.height = "48px";
+
+      // Set processing state
+      this.setProcessingState(true);
+
+      try {
+        const response = await fetch(
+          window.location.pathname + window.location.search,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              "X-CSRFToken": document.querySelector(
+                "[name=csrfmiddlewaretoken]"
+              ).value,
+            },
+            body: new URLSearchParams({
+              message: message,
+              csrfmiddlewaretoken: document.querySelector(
+                "[name=csrfmiddlewaretoken]"
+              ).value,
+            }),
+          }
+        );
+
+        if (!response.ok) throw new Error("Network response was not ok");
+
+        const data = await response.json();
+        this.addMessage("assistant", data.reply);
+      } catch (error) {
+        console.error("Error:", error);
+        this.addMessage(
+          "error",
+          "Sorry, something went wrong. Please try again."
+        );
+      } finally {
+        this.setProcessingState(false);
+      }
+    }
+
+    addMessage(role, content) {
+      const messageDiv = document.createElement("div");
+      messageDiv.className =
+        role === "user" ? "flex justify-end" : "flex justify-start";
+
+      const bubbleClass =
+        role === "user"
+          ? "message-bubble-user"
+          : role === "error"
+          ? "message-bubble-assistant border-red-200 bg-red-50 text-red-800"
+          : "message-bubble-assistant";
+
+      const formattedContent = content.replace(/\n/g, "<br>");
+
+      messageDiv.innerHTML = `
+      <div class="message-bubble ${bubbleClass}">
+        ${formattedContent}
+      </div>
+    `;
+
+      this.chatMessages.appendChild(messageDiv);
+      this.scrollToBottom();
+    }
+
+    setProcessingState(processing) {
+      this.isProcessing = processing;
+      this.sendButton.disabled = processing;
+      this.messageInput.disabled = processing;
+
+      if (processing) {
+        this.loadingIndicator.classList.remove("hidden");
+        this.sendButton.innerHTML = `
+        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span>Sending...</span>
+      `;
+      } else {
+        this.loadingIndicator.classList.add("hidden");
+        this.sendButton.innerHTML = `
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+        </svg>
+        <span>Send</span>
+      `;
+      }
+    }
+
+    togglePanel() {
+      const isMobile = window.innerWidth < 1024;
+
+      if (isMobile) {
+        // Mobile behavior
+        const isOpen = this.markdownPanel.classList.contains("open");
+        if (isOpen) {
+          this.closeMarkdownPanel();
+        } else {
+          this.openMarkdownPanel();
+        }
+      } else {
+        // Desktop behavior
+        const isClosed = this.markdownPanel.classList.contains("closed");
+        if (isClosed) {
+          this.openMarkdownPanel();
+        } else {
+          this.closeMarkdownPanel();
+        }
+      }
+    }
+
+    openMarkdownPanel() {
+      const isMobile = window.innerWidth < 1024;
+
+      if (isMobile) {
+        this.markdownPanel.classList.add("open");
+        this.markdownPanel.classList.remove("closed");
+        this.panelOverlay.classList.remove("hidden");
+        this.toggleIcon.innerHTML =
+          '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
+      } else {
+        this.markdownPanel.classList.remove("closed");
+        this.toggleIcon.innerHTML =
+          '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7m0 0l7-7m-7 7h18"></path>';
+      }
+    }
+
+    closeMarkdownPanel() {
+      const isMobile = window.innerWidth < 1024;
+
+      if (isMobile) {
+        this.markdownPanel.classList.remove("open");
+        this.markdownPanel.classList.add("closed");
+        this.panelOverlay.classList.add("hidden");
+        this.toggleIcon.innerHTML =
+          '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>';
+      } else {
+        this.markdownPanel.classList.add("closed");
+        this.toggleIcon.innerHTML =
+          '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>';
+      }
+    }
+
+    scrollToBottom() {
+      this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+    }
+  }
+
+  // Initialize when DOM is loaded
+  document.addEventListener("DOMContentLoaded", () => {
+    const chat = new ModernChatPlus();
+
+    // Set initial state - sidebar open on desktop, closed on mobile
+    const isMobile = window.innerWidth < 1024;
+    if (isMobile) {
+      chat.closeMarkdownPanel();
+    } else {
+      chat.openMarkdownPanel();
+    }
+  });
+
+  // Handle window resize for responsive behavior
+  window.addEventListener("resize", () => {
+    const markdownPanel = document.getElementById("markdown-panel");
+    const panelOverlay = document.getElementById("panel-overlay");
+
+    if (window.innerWidth >= 1024) {
+      // Desktop: reset mobile classes
+      markdownPanel.classList.remove("open");
+      panelOverlay.classList.add("hidden");
+    }
+  });
+</script>
+
+{% endblock %}

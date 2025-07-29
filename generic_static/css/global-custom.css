@@ -1,0 +1,90 @@
+/* custom.css */
+
+/* Make labels white */
+form label {
+  color: white;
+}
+
+/* Ensure content is readable over the background */
+#chat-container {
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 15px;
+  padding: 20px;
+}
+
+/* Chat window styling */
+#chat-window {
+  border-radius: 15px;
+}
+
+/* Message bubbles */
+#chat-messages .badge {
+  border-radius: 15px;
+  display: inline-block;
+  max-width: 70%;
+  word-wrap: break-word;
+}
+
+/* Common styles for all messages */
+#chat-messages .message {
+  display: inline-block;
+  max-width: 80%; /* Adjust as needed */
+  word-wrap: break-word;
+  word-break: break-word;
+  padding: 10px;
+  border-radius: 15px;
+  margin-bottom: 10px;
+}
+
+/* User messages */
+#chat-messages .user-message {
+  background-color: #007bff;
+  color: white;
+  align-self: flex-end;
+}
+
+/* Assistant messages */
+#chat-messages .assistant-message {
+  background-color: #6c757d;
+  color: white;
+  align-self: flex-start;
+}
+
+/* Increase font sizes on devices with width up to 767px (typical mobile width) */
+@media (max-width: 767px) {
+  body {
+    font-size: 16px; /* Base font size */
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-size: 1.2em; /* Adjust headings */
+  }
+
+  .navbar-brand img {
+    height: 40px; /* Smaller logo on mobile */
+  }
+
+  .card-title {
+    font-size: 1.1em;
+  }
+
+  .card-text {
+    font-size: 0.95em;
+  }
+
+  .btn {
+    font-size: 1em;
+    padding: 10px 20px;
+  }
+
+  /* Adjust input fields */
+  input,
+  textarea {
+    font-size: 1em;
+  }
+}

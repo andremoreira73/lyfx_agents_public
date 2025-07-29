@@ -1,6 +1,6 @@
 # lyfX.ai AgentVerse
 
-A Django-based AI agent platform that provides specialized AI assistants for business automation and workflow optimization. The platform features multiple AI agents, each designed for specific tasks, with a modern web interface and API access.
+A Django- and LangGraph-based AI agent platform that provides specialized AI assistants for business automation and workflow optimization. The platform features multiple AI agents, each designed for specific tasks, with a modern web interface and API access.
 
 ## 🚀 Features
 
@@ -47,8 +47,7 @@ A Django-based AI agent platform that provides specialized AI assistants for bus
 1. Clone the repository and create `.env` file:
 
 ```bash
-cp .env.example .env
-# Edit .env and add your API keys
+   cp example.env .env  # Edit .env and add your API keys
 ```
 
 2. Start the development environment:

@@ -5,7 +5,7 @@ A Django-based AI agent platform that provides specialized AI assistants for bus
 ## 🚀 Features
 
 - **Multiple Specialized AI Agents**:
-  - **CO2 Calculator (cccalc)**: Calculates carbon emissions and carbon credits for chemicals
+  - **CO2 Calculator (cccalc)**: Calculates carbon emissions and carbon credits for chemicals; for more information see our [blog](https://lyfx.ai/use-case-for-the-real-world-estimating-chemical-carbon-footprints-using-ai/).
   - **Lyras**: Company information assistant for lyfX.ai
   - **IM Scanner**: Scans German energy companies for interim management positions
 - **Modern Chat Interfaces**:
